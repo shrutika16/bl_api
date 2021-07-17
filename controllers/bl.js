@@ -1,5 +1,5 @@
 var express = require('express');
-var mongoose = require('mongoose')
+var mongoose = require('mongoose');
 
 var router = express.Router();
 
@@ -27,8 +27,44 @@ router.get('/detail', async (req, res) => {
     });
 });
 
+//pagination
+const getPagination = (page, size) => {
+  const setLimit = size ? +size : 10;
+  const setOffset = page ? (page * setLimit) - setLimit  : 0;
+  return { setLimit, setOffset };
+};
+
 router.get('/list', async (req, res) => {
-  memories.find()
+  // search result
+  const searchData = req.query.search ?? '';
+  
+  const searchDataRegex = new RegExp(searchData, 'i')
+  
+  const page = req.query.page;
+  const size = 10;
+  const { setLimit, setOffset } = getPagination(page, size);
+  
+  memories
+    .find(
+      {
+        $or:
+          [
+            { title: searchDataRegex },
+            { description: searchDataRegex },
+            { image_name: searchDataRegex },
+            { url: searchDataRegex },
+            { 'meta_data.Photographer': searchDataRegex },
+            { 'meta_data.Medium' : searchDataRegex },
+            { 'meta_data.Date' : searchDataRegex },
+            { 'meta_data.Shelfmark' : searchDataRegex },
+            { 'meta_data.Item number': searchDataRegex },
+            { 'meta_data.Genre' : searchDataRegex },
+            { full_img_page_url: searchDataRegex },
+            { data_file: searchDataRegex }
+          ]
+      })
+    .limit(setLimit)
+    .skip(setOffset)
     .then(memories => {
         let resarr = HELPER.getResponse({
           success: true,

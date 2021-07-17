@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
-const NoteSchema = mongoose.Schema({
+
+const schema = mongoose.Schema({
     _id : mongoose.Schema.Types.ObjectId,
     title: String,
     url:  {
@@ -23,4 +24,4 @@ const NoteSchema = mongoose.Schema({
     // timestamps: true
 });
 
-module.exports = mongoose.model('memories', NoteSchema);
+module.exports = mongoose.model('memories', schema);
